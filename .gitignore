@@ -1,20 +1,20 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-/.pnp
+node_modules/
+.pnp
 .pnp.js
 .yarn/install-state.gz
 
 # testing
-/coverage
+coverage/
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build/
 
 # misc
 .DS_Store
@@ -26,7 +26,17 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
+.env
+.env.local
+.env.*.local
+
+# Ignore .env files in client and server directories
+client/.env
+client/.env.local
+client/.env.*.local
+server/.env
+server/.env.local
+server/.env.*.local
 
 # vercel
 .vercel
