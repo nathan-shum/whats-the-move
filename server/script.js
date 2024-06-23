@@ -25,7 +25,7 @@ export async function generateItinerary(location, time, activities, numberOfActi
     model: "gpt-4-turbo",
   });
   const messageContent = completion.choices[0].message.content;
-  
+
   // Log the type of message content
   console.log('Type of message content:', typeof messageContent);
   
@@ -37,6 +37,5 @@ export async function generateItinerary(location, time, activities, numberOfActi
 
 (async () => {
     const itinerary = await generateItinerary('San Francisco', '10:00 AM', '5:00 PM', ['sightseeing', 'lunch', 'museum'], '1 hour');
-    console.log(itinerary);
 })();
   
