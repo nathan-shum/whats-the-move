@@ -56,33 +56,37 @@ const Itinerary = () => {
 
   const [selectedActivity, setSelectedActivity] = useState(null);
 
-  const handleActivityClick = ({activity} : {activity: any}) => {
-    console.log("Activity clicked:", activity); // Add this log to verify the click handler
+  const handleActivityClick = (activity: React.SetStateAction<null>) => {
+    console.log("Activity clicked:", activity); // Verify the click handler
     setSelectedActivity(activity);
   };
+
+  console.log("Selected Activity:", selectedActivity); // Log the selected activity state
 
   return (
     <div>
       <p className="[font-family:'Poppins-Bold',Helvetica] font-bold text-black text-[40px] tracking-[0] leading-[normal] px-20 py-10">
         Discover Your Perfect Day: Handpick Your Adventures!
       </p>
-      <div className='px-20 w-[1000px] py-10'>
-        {itinerary.length > 0 ? (
-            itinerary.map((activity, index) => (
-              <ActivityCard
-                key={activity.id}
-                activity={activity}
-                onClick={() => handleActivityClick(activity)}
-              />
-            ))
-          ) : (
-            <p>Loading...</p>
-        )}
-      </div>
-      <div className='px-20 w-[1000px] py-10'>
-        {selectedActivity && (
-          <ActivityInfo activity={selectedActivity}/>
-        )}
+      <div  style={{ display: 'flex', flexDirection: 'row', gap: '10px', justifyContent: 'center', alignItems: 'flex-start', width: '100%' }} >
+        <div className='px-20 w-[1000px] py-10'>
+          {itinerary.length > 0 ? (
+              itinerary.map((activity, index) => (
+                <ActivityCard
+                  key={activity.id}
+                  activity={activity}
+                  onClick={handleActivityClick}
+                />
+              ))
+            ) : (
+              <p>Loading...</p>
+          )}
+        </div>
+        <div className='px-20 w-[1000px] py-10'>
+          {selectedActivity && (
+            <ActivityInfo activity={selectedActivity}/>
+          )}
+        </div>
       </div>
     </div>
   );
