@@ -13,6 +13,7 @@ const ActivityCard = ({ activity, onClick }: { activity: any , onClick: any}) =>
             <div className="absolute w-[803px] h-[172px]">
             <div className="w-[785px] h-[153px] top-[19px] left-[18px] bg-[#faf7f0] absolute rounded-[17.28px]" />
             <div className="w-[501px] h-[65px] top-[95px] left-10 bg-[#d9d9d9] absolute rounded-[17.28px]" />
+            <img className="left-[10px] absolute w-5 h-5 top-3 object-cover" alt="Close" src="/images/close.png" />
             <p className="absolute w-[495px] top-[93px] left-[60px] [font-family:'Poppins-Regular',Helvetica] font-normal text-black text-[14.4px] tracking-[-0.41px] leading-[34.6px]">
                 {activity['Brief Description']}
             </p>
