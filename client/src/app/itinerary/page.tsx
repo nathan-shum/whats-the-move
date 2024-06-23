@@ -32,8 +32,14 @@ const Itinerary = () => {
 
   return (
     <div>
-      <h1>Generated Itinerary</h1>
-      {itinerary ? <p>{itinerary}</p> : <p>Loading...</p>}
+      <div className="bg-white flex flex-row justify-center w-full">
+        <div className="bg-white w-full h-[1024px] relative">
+          <p className="absolute top-9 left-[85px] [font-family:'Poppins-Bold',Helvetica] font-bold text-black text-[40px] tracking-[0] leading-[normal]">
+            Discover Your Perfect Day: Handpick Your Adventures!
+          </p>
+          {itinerary ? <p className="absolute top-[200px] left-[85px] w-[900px]">{itinerary}</p> : <p>Loading...</p>}
+        </div>
+      </div>
     </div>
   );
 }
