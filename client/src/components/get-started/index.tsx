@@ -2,6 +2,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const GettingStarted = () => {
   const router = useRouter();
@@ -17,9 +18,12 @@ const GettingStarted = () => {
             Get Started
         </div>
         <div onClick={handleStart} className="absolute w-[165px] h-[60px] top-[34px] left-[calc(100vw-200px)] bg-black rounded-[37.5px]" />
-        <div onClick={handleStart} className="absolute top-[calc(100vh-985px)] left-[calc(100vw-165px)] [font-family:'Poppins-Bold',Helvetica] font-bold text-white text-[32px] tracking-[0] leading-[normal]">
-        Log in
-        </div>
+        <Link
+          className="absolute top-[calc(100vh-985px)] left-[calc(100vw-165px)] [font-family:'Poppins-Bold',Helvetica] font-bold text-white text-[32px] tracking-[0] leading-[normal]"
+          href="/dashboard"
+        >
+          Log in
+        </Link>
         <Image className="absolute w-[146px] h-[50px] top-[30px] left-[34px]" alt="Wtm" src="/images/WTM.svg" width={1000} height={760} quality={95} />
         <Image className="absolute w-[800px] h-[700px] top-[90px] left-[550px]" alt="slogan" src="/images/needs-a-move.svg" width={1000} height={760} quality={95} />
     </div>
