@@ -31,12 +31,12 @@ yarn-error.log*
 .env.*.local
 
 # Ignore .env files in client and server directories
-client/.env
-client/.env.local
-client/.env.*.local
-server/.env
-server/.env.local
-server/.env.*.local
+/client/.env
+/client/.env.local
+/client/.env.*.local
+/server/.env
+/server/.env.local
+/server/.env.*.local
 
 # vercel
 .vercel
