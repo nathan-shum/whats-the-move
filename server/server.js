@@ -15,10 +15,10 @@ app.get('/', (req, res) => {
 
 app.post('/api/itinerary', async (req, res) => {
     const { location, time, activities, numberOfActivities } = req.body;
-  
+    console.log("a request has been made!")
     try {
-      const generatedItinerary = await generateItinerary(location, time, activities, numberOfActivities);
-      res.json({ itinerary: generatedItinerary });
+      const itinerary = await generateItinerary(location, time, activities, numberOfActivities);
+      res.json(itinerary);
     } catch (error) {
       console.error('Error generating itinerary:', error);
       res.status(500).send('An error occurred while generating the itinerary');

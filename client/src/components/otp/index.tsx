@@ -11,7 +11,7 @@ const OTPInput = ({ otp, setOtp }: Props) => {
     <InputOTP
       maxLength={6}
       value={otp}
-      onChange={(otp) => setOtp(otp)}
+      onChange={(otp: string) => setOtp(otp)}
     >
       <div className="flex gap-3">
         <div>

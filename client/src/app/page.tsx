@@ -4,17 +4,19 @@ import Steps from '@/components/steps'
 import Theme from '@/components/themes'
 import Quote from '@/components/quote'
 import Footer from '@/components/footer'
+import Hero from '@/components/hero'
 
 export default function Home() {
   return (
     <div className="bg-white flex flex-row justify-center w-full">
-      <div className="bg-white overflow-hidden h-[5480px] w-100vw">
-        <GettingStarted />
+      <div className="flex flex-col bg-white w-full">
+        <Hero />
+        {/* <GettingStarted />
         <Embark />
         <Steps />
         <Theme />
         <Quote />
-        <Footer />
+        <Footer /> */}
       </div>
     </div>
   );
