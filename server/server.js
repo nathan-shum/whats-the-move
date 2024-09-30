@@ -15,16 +15,17 @@ app.get('/', (req, res) => {
 
 app.post('/api/itinerary', async (req, res) => {
     const { location, time, activities, numberOfActivities } = req.body;
-    console.log("a request has been made!")
+    console.log("A request has been made!");
     try {
       const itinerary = await generateItinerary(location, time, activities, numberOfActivities);
-      res.json(itinerary);
+      res.json(itinerary); // Now includes image URLs
+      console.log(itinerary);
     } catch (error) {
       console.error('Error generating itinerary:', error);
       res.status(500).send('An error occurred while generating the itinerary');
     }
 });
-  
+
 app.listen(port, () => {
   console.log(`Backend server running at http://localhost:${port}`);
 });

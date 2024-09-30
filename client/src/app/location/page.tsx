@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import React from 'react'
 import Image from 'next/image'
+import GoogleMapsPlaces from '../../components/map'
 
 const Location = () => {
   const [location, setLocation] = useState<string>('');
@@ -78,6 +79,7 @@ const Location = () => {
         </div>
         <div className="absolute top-[484px] left-[230px] [font-family:'Poppins-Bold',Helvetica] font-bold text-black text-[40px] tracking-[0] leading-[normal]">
           Where's the Move?
+          <GoogleMapsPlaces />
         </div>
         <div className="absolute w-[117px] h-[50px] top-[600px] left-[480px] bg-[#fde2c0] rounded-[25px] z-0">
           <button className="absolute w-[117px] h-[50px] [font-family:'Poppins-Regular', Helvetica] font-normal text-black z-10" onClick={handleNext}>Next</button>
