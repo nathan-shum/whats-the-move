@@ -4,6 +4,7 @@ import axios from "axios";
 import React from "react";
 import { SimpleCarousel } from "../../components/card-hover-carousel";
 import { DirectionAwareHover } from "../../components/hover-card";
+import Map from '../../components/Map';
 
 const Itinerary = () => {
   const [itinerary, setItinerary] = useState<any[]>([]);
@@ -69,41 +70,48 @@ const Itinerary = () => {
   }, []);
 
   return (
-    <div>
-      <p className="font-bold text-black text-[40px] tracking-[0] leading-[normal] px-20 py-10">
-        Discover Your Perfect Day: Handpick Your Adventures!
-      </p>
-      {itinerary.length > 0 ? (
-        <div className="max-w-8xl">
-          <SimpleCarousel>
-            {itinerary.map((activity, index) => (
-              <DirectionAwareHover
-                key={index}
-                imageUrl={activity.imageUrl || "/placeholder.jpg"} // Use placeholder if imageUrl is null
-                className="h-80 w-56 md:h-[40rem] md:w-96"
-              >
-                <p className="font-bold text-xl text-white">
-                  {activity.Activity}
-                </p>
-                <p className="font-normal text-sm mt-2 text-white">
-                  {activity["Brief Description"]}
-                </p>
-                <p className="font-normal text-sm mt-2 text-white">
-                  Time: {activity["Time Frame"]}
-                </p>
-                <p className="font-normal text-sm mt-2 text-white">
-                  Location: {activity.Location}
-                </p>
-                <p className="font-normal text-sm mt-2 text-white">
-                  Address: {activity.Address}
-                </p>
-              </DirectionAwareHover>
-            ))}
-          </SimpleCarousel>
-        </div>
-      ) : (
-        <p>Loading...</p>
-      )}
+    <div className="flex">
+      <div className="w-2/3">
+        <p className="font-bold text-black text-[40px] tracking-[0] leading-[normal] px-20 py-10">
+          Discover Your Perfect Day: Handpick Your Adventures!
+        </p>
+        {itinerary.length > 0 ? (
+          <div className="max-w-8xl">
+            <SimpleCarousel>
+              {itinerary.map((activity, index) => (
+                <DirectionAwareHover
+                  key={index}
+                  imageUrl={activity.imageUrl || "/placeholder.jpg"} // Use placeholder if imageUrl is null
+                  className="h-80 w-56 md:h-[40rem] md:w-96"
+                >
+                  <p className="font-bold text-xl text-white">
+                    {activity.Activity}
+                  </p>
+                  <p className="font-normal text-sm mt-2 text-white">
+                    {activity["Brief Description"]}
+                  </p>
+                  <p className="font-normal text-sm mt-2 text-white">
+                    Time: {activity["Time Frame"]}
+                  </p>
+                  <p className="font-normal text-sm mt-2 text-white">
+                    Location: {activity.Location}
+                  </p>
+                  <p className="font-normal text-sm mt-2 text-white">
+                    Address: {activity.Address}
+                  </p>
+                </DirectionAwareHover>
+              ))}
+            </SimpleCarousel>
+          </div>
+        ) : (
+          <p>Loading...</p>
+        )}
+      </div>
+      <div className="w-1/3 h-screen sticky top-0">
+        {itinerary.length > 0 && (
+          <Map addresses={itinerary.map(activity => activity.Address).filter(Boolean)} />
+        )}
+      </div>
     </div>
   );
 };
