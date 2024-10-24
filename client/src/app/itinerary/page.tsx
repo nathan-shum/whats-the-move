@@ -1,13 +1,18 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import axios from "axios";
-import React from "react";
-import { SimpleCarousel } from "../../components/card-hover-carousel";
-import { DirectionAwareHover } from "../../components/hover-card";
-import Map from '../../components/Map';
+import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import Map, { MapProps } from "@/components/earth";
 
 const Itinerary = () => {
   const [itinerary, setItinerary] = useState<any[]>([]);
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
+  const [showMap, setShowMap] = useState(false);
+  const [isEarthView, setIsEarthView] = useState(false);
 
   // Fetch itinerary from the server
   const fetchItinerary = async () => {
@@ -56,6 +61,7 @@ const Itinerary = () => {
         console.log("Fetched itinerary data:", data);
         if (isMounted && Array.isArray(data)) {
           setItinerary(data);
+          setSelectedActivity(data[0]); // Set the first activity as selected
         } else {
           console.error("Fetched data is not an array:", data);
         }
@@ -70,46 +76,105 @@ const Itinerary = () => {
   }, []);
 
   return (
-    <div className="flex">
-      <div className="w-2/3">
-        <p className="font-bold text-black text-[40px] tracking-[0] leading-[normal] px-20 py-10">
-          Discover Your Perfect Day: Handpick Your Adventures!
-        </p>
-        {itinerary.length > 0 ? (
-          <div className="max-w-8xl">
-            <SimpleCarousel>
-              {itinerary.map((activity, index) => (
-                <DirectionAwareHover
-                  key={index}
-                  imageUrl={activity.imageUrl || "/placeholder.jpg"} // Use placeholder if imageUrl is null
-                  className="h-80 w-56 md:h-[40rem] md:w-96"
-                >
-                  <p className="font-bold text-xl text-white">
-                    {activity.Activity}
-                  </p>
-                  <p className="font-normal text-sm mt-2 text-white">
-                    {activity["Brief Description"]}
-                  </p>
-                  <p className="font-normal text-sm mt-2 text-white">
-                    Time: {activity["Time Frame"]}
-                  </p>
-                  <p className="font-normal text-sm mt-2 text-white">
-                    Location: {activity.Location}
-                  </p>
-                  <p className="font-normal text-sm mt-2 text-white">
-                    Address: {activity.Address}
-                  </p>
-                </DirectionAwareHover>
-              ))}
-            </SimpleCarousel>
-          </div>
-        ) : (
-          <p>Loading...</p>
-        )}
+    <div className="flex flex-col h-screen bg-[#faf3e0]">
+      {/* Header */}
+      <header className="bg-[#5c3d2e] text-white p-4">
+        <h1 className="text-2xl font-bold">WTM</h1>
+        <div className="flex items-center space-x-4 mt-2">
+          <span>{localStorage.getItem("location")}</span>
+          <span>{itinerary.length} activities</span>
+          <select className="bg-[#8b5e3c] text-white p-1 rounded">
+            <option>category</option>
+          </select>
+        </div>
+      </header>
+
+      {/* Activity Timeline */}
+      <div className="flex items-center justify-between p-4 bg-[#fedd91]">
+        <span className="font-bold">{localStorage.getItem("startTime")}</span>
+        <div className="flex-1 flex justify-center space-x-4 overflow-x-auto">
+          {itinerary.map((activity, index) => (
+            <Card
+              key={index}
+              className="relative w-48 h-24 cursor-pointer overflow-hidden flex-shrink-0"
+              onClick={() => setSelectedActivity(activity)}
+            >
+              <Image
+                src={activity.imageUrl || "/placeholder.jpg"}
+                alt={activity.Activity}
+                layout="fill"
+                objectFit="cover"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                <span className="text-white font-bold text-center">
+                  {activity.Activity}
+                </span>
+              </div>
+            </Card>
+          ))}
+        </div>
+        <span className="font-bold">{localStorage.getItem("endTime")}</span>
       </div>
-      <div className="w-1/3 h-screen sticky top-0">
-        {itinerary.length > 0 && (
-          <Map addresses={itinerary.map(activity => activity.Address).filter(Boolean)} />
+
+      {/* Main Content */}
+      <div className="flex-1 flex">
+        {/* Google Earth/Maps View */}
+        <div className="flex-1 relative">
+          <Map
+            addresses={itinerary.map((activity) => activity.Address).filter(Boolean)}
+            isEarthView={isEarthView}
+            selectedActivity={selectedActivity}
+          />
+          <Button
+            className="absolute top-4 right-4 bg-white text-black"
+            onClick={() => setIsEarthView(!isEarthView)}
+          >
+            Switch to {isEarthView ? "Map" : "Earth"} View
+          </Button>
+        </div>
+
+        {/* Activity Carousel */}
+        {selectedActivity && (
+          <div className="w-96 bg-white p-4 overflow-y-auto">
+            <h2 className="text-2xl font-bold mb-4">{selectedActivity.Activity}</h2>
+            <Image
+              src={selectedActivity.imageUrl || "/placeholder.jpg"}
+              alt={selectedActivity.Activity}
+              width={300}
+              height={200}
+              className="rounded-lg mb-4"
+            />
+            <p className="mb-4">{selectedActivity["Brief Description"]}</p>
+            <p className="mb-2">Time: {selectedActivity["Time Frame"]}</p>
+            <p className="mb-2">Location: {selectedActivity.Location}</p>
+            <p className="mb-4">Address: {selectedActivity.Address}</p>
+            <div className="flex justify-between">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  const currentIndex = itinerary.indexOf(selectedActivity);
+                  if (currentIndex > 0) {
+                    setSelectedActivity(itinerary[currentIndex - 1]);
+                  }
+                }}
+              >
+                <ChevronLeft />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  const currentIndex = itinerary.indexOf(selectedActivity);
+                  if (currentIndex < itinerary.length - 1) {
+                    setSelectedActivity(itinerary[currentIndex + 1]);
+                  }
+                }}
+              >
+                <ChevronRight />
+              </Button>
+            </div>
+          </div>
         )}
       </div>
     </div>
