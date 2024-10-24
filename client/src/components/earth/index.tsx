@@ -3,14 +3,14 @@ import { Loader } from '@googlemaps/js-api-loader';
 
 export interface MapProps {
   addresses: string[];
-  isEarthView: boolean;
   selectedActivity: {
     Address: string;
     Location: string;
   } | null;
+  isStreetView: boolean;
 }
 
-const Map: React.FC<MapProps> = ({ addresses, isEarthView, selectedActivity }) => {
+const Map: React.FC<MapProps> = ({ addresses, selectedActivity, isStreetView }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [streetView, setStreetView] = useState<google.maps.StreetViewPanorama | null>(null);
@@ -36,13 +36,10 @@ const Map: React.FC<MapProps> = ({ addresses, isEarthView, selectedActivity }) =
     const newMap = new google.maps.Map(mapRef.current, {
       center: { lat: 0, lng: 0 },
       zoom: 2,
-      mapTypeId: isEarthView ? 'satellite' : 'roadmap',
-      tilt: isEarthView ? 45 : 0,
     });
 
     const newStreetView = new google.maps.StreetViewPanorama(mapRef.current, {
       visible: false,
-      enableCloseButton: true,
     });
 
     newMap.setStreetView(newStreetView);
@@ -92,7 +89,7 @@ const Map: React.FC<MapProps> = ({ addresses, isEarthView, selectedActivity }) =
         }
       });
     });
-  }, [mapLoaded, addresses, isEarthView]);
+  }, [mapLoaded, addresses]);
 
   useEffect(() => {
     if (map && streetView && selectedActivity) {
@@ -100,24 +97,23 @@ const Map: React.FC<MapProps> = ({ addresses, isEarthView, selectedActivity }) =
       geocoder.geocode({ address: selectedActivity.Address }, (results, status) => {
         if (status === 'OK' && results && results[0]) {
           const position = results[0].geometry.location;
-          if (isEarthView) {
-            streetView.setPosition(position);
-            streetView.setVisible(true);
-          } else {
-            map.setCenter(position);
-            map.setZoom(18);
-          }
+          map.setCenter(position);
+          map.setZoom(18);
+          streetView.setPosition(position);
         }
       });
     }
-  }, [map, streetView, selectedActivity, isEarthView]);
+  }, [map, streetView, selectedActivity]);
 
   useEffect(() => {
-    if (map) {
-      map.setMapTypeId(isEarthView ? 'satellite' : 'roadmap');
-      map.setTilt(isEarthView ? 45 : 0);
+    if (map && streetView) {
+      if (isStreetView) {
+        streetView.setVisible(true);
+      } else {
+        streetView.setVisible(false);
+      }
     }
-  }, [isEarthView, map]);
+  }, [isStreetView, map, streetView]);
 
   return <div ref={mapRef} style={{ width: '100%', height: '100%' }} />;
 };

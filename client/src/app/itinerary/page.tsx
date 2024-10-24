@@ -6,13 +6,14 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import Map, { MapProps } from "@/components/earth";
+import Map from "@/components/earth";
 
 const Itinerary = () => {
   const [itinerary, setItinerary] = useState<any[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
   const [showMap, setShowMap] = useState(false);
   const [isEarthView, setIsEarthView] = useState(false);
+  const [isStreetView, setIsStreetView] = useState(false);
 
   // Fetch itinerary from the server
   const fetchItinerary = async () => {
@@ -118,18 +119,18 @@ const Itinerary = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex">
-        {/* Google Earth/Maps View */}
+        {/* Google Maps/Street View */}
         <div className="flex-1 relative">
           <Map
             addresses={itinerary.map((activity) => activity.Address).filter(Boolean)}
-            isEarthView={isEarthView}
             selectedActivity={selectedActivity}
+            isStreetView={isStreetView}
           />
           <Button
-            className="absolute top-4 right-4 bg-white text-black"
-            onClick={() => setIsEarthView(!isEarthView)}
+            className="absolute top-4 right-4 bg-white text-black z-10"
+            onClick={() => setIsStreetView(!isStreetView)}
           >
-            Switch to {isEarthView ? "Map" : "Earth"} View
+            Switch to {isStreetView ? "Map" : "Street"} View
           </Button>
         </div>
 
