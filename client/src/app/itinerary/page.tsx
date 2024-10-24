@@ -3,17 +3,19 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Map from "@/components/earth";
+import ActivityCarousel from "@/components/activity-card";
 
 const Itinerary = () => {
   const [itinerary, setItinerary] = useState<any[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
+  const [alternatives, setAlternatives] = useState<any[]>([]);
   const [showMap, setShowMap] = useState(false);
   const [isEarthView, setIsEarthView] = useState(false);
   const [isStreetView, setIsStreetView] = useState(false);
+  const [history, setHistory] = useState<any[]>([]);
 
   // Fetch itinerary from the server
   const fetchItinerary = async () => {
@@ -41,7 +43,7 @@ const Itinerary = () => {
         console.log("Response from backend:", response.data);
 
         if (response.data && Array.isArray(response.data.Activities)) {
-          return response.data.Activities;
+          return response.data;
         } else {
           console.error("Unexpected itinerary format:", response.data);
           return [];
@@ -60,11 +62,12 @@ const Itinerary = () => {
     fetchItinerary()
       .then((data) => {
         console.log("Fetched itinerary data:", data);
-        if (isMounted && Array.isArray(data)) {
-          setItinerary(data);
-          setSelectedActivity(data[0]); // Set the first activity as selected
+        if (isMounted && Array.isArray(data.Activities)) {
+          setItinerary(data.Activities.map(activitySet => activitySet.MainActivity));
+          setSelectedActivity(data.Activities[0].MainActivity);
+          setAlternatives(data.Activities.map(activitySet => activitySet.Alternatives));
         } else {
-          console.error("Fetched data is not an array:", data);
+          console.error("Fetched data is not in the expected format:", data);
         }
       })
       .catch((error) => {
@@ -75,6 +78,52 @@ const Itinerary = () => {
       isMounted = false;
     };
   }, []);
+
+  const handleRemoveActivity = async () => {
+    const currentIndex = itinerary.indexOf(selectedActivity);
+    if (alternatives[currentIndex].length > 0) {
+      // Use an alternative if available
+      const newActivity = alternatives[currentIndex].shift();
+      const newItinerary = [...itinerary];
+      newItinerary[currentIndex] = newActivity;
+      setItinerary(newItinerary);
+      setSelectedActivity(newActivity);
+      setHistory([...history, itinerary]);
+    } else {
+      // If no alternatives, fetch new ones
+      try {
+        const response = await axios.post("http://localhost:8080/api/replace-activity", {
+          location: localStorage.getItem("location"),
+          time: selectedActivity["Time Frame"],
+          excludedActivity: selectedActivity.Activity
+        });
+
+        const newActivities = response.data.Alternatives;
+        const newActivity = newActivities.shift();
+        const newItinerary = [...itinerary];
+        newItinerary[currentIndex] = newActivity;
+        setItinerary(newItinerary);
+        setSelectedActivity(newActivity);
+        setAlternatives(prevAlternatives => {
+          const newAlternatives = [...prevAlternatives];
+          newAlternatives[currentIndex] = newActivities;
+          return newAlternatives;
+        });
+        setHistory([...history, itinerary]);
+      } catch (error) {
+        console.error("Error replacing activity:", error);
+      }
+    }
+  };
+
+  const handleUndo = () => {
+    if (history.length > 0) {
+      const previousItinerary = history[history.length - 1];
+      setItinerary(previousItinerary);
+      setSelectedActivity(previousItinerary[itinerary.indexOf(selectedActivity)]);
+      setHistory(history.slice(0, -1));
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen bg-[#faf3e0]">
@@ -135,48 +184,24 @@ const Itinerary = () => {
         </div>
 
         {/* Activity Carousel */}
-        {selectedActivity && (
-          <div className="w-96 bg-white p-4 overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-4">{selectedActivity.Activity}</h2>
-            <Image
-              src={selectedActivity.imageUrl || "/placeholder.jpg"}
-              alt={selectedActivity.Activity}
-              width={300}
-              height={200}
-              className="rounded-lg mb-4"
-            />
-            <p className="mb-4">{selectedActivity["Brief Description"]}</p>
-            <p className="mb-2">Time: {selectedActivity["Time Frame"]}</p>
-            <p className="mb-2">Location: {selectedActivity.Location}</p>
-            <p className="mb-4">Address: {selectedActivity.Address}</p>
-            <div className="flex justify-between">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => {
-                  const currentIndex = itinerary.indexOf(selectedActivity);
-                  if (currentIndex > 0) {
-                    setSelectedActivity(itinerary[currentIndex - 1]);
-                  }
-                }}
-              >
-                <ChevronLeft />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => {
-                  const currentIndex = itinerary.indexOf(selectedActivity);
-                  if (currentIndex < itinerary.length - 1) {
-                    setSelectedActivity(itinerary[currentIndex + 1]);
-                  }
-                }}
-              >
-                <ChevronRight />
-              </Button>
-            </div>
-          </div>
-        )}
+        <ActivityCarousel
+          selectedActivity={selectedActivity}
+          onPrevious={() => {
+            const currentIndex = itinerary.indexOf(selectedActivity);
+            if (currentIndex > 0) {
+              setSelectedActivity(itinerary[currentIndex - 1]);
+            }
+          }}
+          onNext={() => {
+            const currentIndex = itinerary.indexOf(selectedActivity);
+            if (currentIndex < itinerary.length - 1) {
+              setSelectedActivity(itinerary[currentIndex + 1]);
+            }
+          }}
+          onRemove={handleRemoveActivity}
+          onAccept={() => {/* Implement accept logic if needed */}}
+          onUndo={handleUndo}
+        />
       </div>
     </div>
   );
